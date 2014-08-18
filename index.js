@@ -16,7 +16,7 @@ module.exports = function (options) {
 		checker.configure(loadConfigFile.load(options));
 	}
 
-	return through.obj(function (file, enc, cb) {
+	var stream = through.obj(function (file, enc, cb) {
 		if (file.isNull()) {
 			this.push(file);
 			cb();
@@ -44,6 +44,7 @@ module.exports = function (options) {
 			out.push(err.message.replace('null:', file.relative + ':'));
 		}
 
+		this.push(file);
 		cb();
 	}, function (cb) {
 		if (out.length > 0) {
@@ -54,4 +55,7 @@ module.exports = function (options) {
 
 		cb();
 	});
+    
+    stream.resume();
+    return stream;
 };
